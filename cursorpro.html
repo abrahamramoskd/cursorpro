@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Generador de Arte Generativo 🎨</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: black;
+        }
+        #art-canvas {
+            width: 100%;
+            height: 100vh;
+        }
+        #controls {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(255,255,255,0.2);
+            padding: 15px;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+        }
+        button {
+            margin: 5px;
+            padding: 5px 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="art-canvas"></canvas>
+    <div id="controls">
+        <button id="color-btn">Cambiar Paleta</button>
+        <button id="reset-btn">Reiniciar</button>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('art-canvas');
+        const ctx = canvas.getContext('2d');
+        const colorBtn = document.getElementById('color-btn');
+        const resetBtn = document.getElementById('reset-btn');
+
+        // Configurar canvas al tamaño completo
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        // Paletas de colores
+        const colorPalettes = [
+            ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FDCB6E', '#6C5CE7'],
+            ['#FF00FF', '#00FFFF', '#FFFF00', '#FF0000', '#0000FF'],
+            ['#8E44AD', '#3498DB', '#E74C3C', '#2ECC71', '#F39C12']
+        ];
+
+        class Particle {
+            constructor(x, y, color) {
+                this.x = x;
+                this.y = y;
+                this.size = Math.random() * 10 + 1;
+                this.speedX = Math.random() * 3 - 1.5;
+                this.speedY = Math.random() * 3 - 1.5;
+                this.color = color;
+                this.opacity = 1;
+            }
+
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                
+                // Efecto de desvanecimiento
+                if (this.size > 0.2) this.size -= 0.1;
+                this.opacity -= 0.01;
+            }
+
+            draw() {
+                ctx.beginPath();
+                ctx.fillStyle = this.color;
+                ctx.globalAlpha = this.opacity;
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        class ArtGenerator {
+            constructor() {
+                this.particles = [];
+                this.currentPalette = colorPalettes[0];
+            }
+
+            init() {
+                this.particles = [];
+            }
+
+            createParticles(x, y) {
+                for (let i = 0; i < 50; i++) {
+                    const randomColor = this.currentPalette[Math.floor(Math.random() * this.currentPalette.length)];
+                    this.particles.push(new Particle(x, y, randomColor));
+                }
+            }
+
+            handleParticles() {
+                this.particles.forEach((particle, index) => {
+                    particle.update();
+                    particle.draw();
+
+                    // Eliminar partículas muertas
+                    if (particle.opacity <= 0) {
+                        this.particles.splice(index, 1);
+                    }
+                });
+            }
+
+            changePalette() {
+                const currentIndex = colorPalettes.indexOf(this.currentPalette);
+                this.currentPalette = colorPalettes[(currentIndex + 1) % colorPalettes.length];
+            }
+        }
+
+        const artGenerator = new ArtGenerator();
+
+        // Animación
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            artGenerator.handleParticles();
+            requestAnimationFrame(animate);
+        }
+
+        // Eventos
+        canvas.addEventListener('mousemove', (event) => {
+            artGenerator.createParticles(event.x, event.y);
+        });
+
+        canvas.addEventListener('click', (event) => {
+            artGenerator.createParticles(event.x, event.y);
+        });
+
+        colorBtn.addEventListener('click', () => {
+            artGenerator.changePalette();
+        });
+
+        resetBtn.addEventListener('click', () => {
+            artGenerator.init();
+        });
+
+        // Manejar redimensionamiento
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+
+        // Iniciar animación
+        animate();
+    </script>
+</body>
+</html>
