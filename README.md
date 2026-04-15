@@ -10,10 +10,7 @@ Lienzo interactivo que genera partículas animadas al mover o hacer clic con el 
 
 ## ✨ Live Demo
 
-👉 **[Ver demo en vivo](https://abrahamramoskd.github.io/cursorpro/cursorpro.html)**
-
-> ⚠️ Asegúrate de tener GitHub Pages activo en este repo (Settings → Pages → rama `main`, carpeta `/root`).
-
+👉 **[Ver demo en vivo](https://abrahamramoskd.github.io/cursorpro)**
 ## 🎨 Características
 
 - 🖱️ **Partículas en movimiento** — se generan al mover el cursor por el lienzo
